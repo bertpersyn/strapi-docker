@@ -75,5 +75,6 @@ jobs:
           tags: ${{ steps.docker_strapi_meta.outputs.tags }}
           labels: ${{ steps.docker_strapi_meta.outputs.labels }}
           build-args: |
+            DOCKER_IMAGE=bertpersyn/strapi-base
             BASE_VERSION=${{ env.NODE_VERSION }}
             STRAPI_VERSION=${{ steps.docker_strapi_meta.outputs.version }}
