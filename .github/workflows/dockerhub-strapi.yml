@@ -8,6 +8,9 @@ on:
       - 'v*'
   pull_request:
 
+env:
+  NODE_VERSION: 14.15.3-alpine3.12
+
 jobs:
   multi:
     runs-on: ubuntu-latest
@@ -16,12 +19,22 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Docker meta
-        id: docker_meta
+        name: Docker strapi base meta
+        id: docker_base_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: bertpersyn/strapi # list of Docker images to use as base name for tags
-          tag-sha: true # add git short SHA as Docker tag
+          images: bertpersyn/strapi-base
+          tag-sha: true
+      -
+        name: Docker strapi base meta
+        id: docker_strapi_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: bertpersyn/strapi
+          tag-sha: true
+          tag-semver: |
+            {{version}}
+            {{major}}.{{minor}}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -36,13 +49,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
-        id: docker_build
+        name: Build and push base
+        id: docker_base_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./base/alpine/Dockerfile
+          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.NODE_VERSION }}
+          labels: ${{ steps.docker_base_meta.outputs.labels }}
+          build-args: |
+            NODE_VERSION=${{ env.NODE_VERSION }}
+      -
+        name: Build and push strapi
+        id: docker_strapi_build
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./strapi/Dockerfile
           platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          tags: ${{ steps.docker_strapi_meta.outputs.tags }}
+          labels: ${{ steps.docker_strapi_meta.outputs.labels }}
+          build-args: |
+            BASE_VERSION=${{ env.NODE_VERSION }}
+            STRAPI_VERSION=${{ steps.docker_strapi_meta.outputs.version }}
