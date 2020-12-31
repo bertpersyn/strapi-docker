@@ -10,6 +10,7 @@ on:
 
 env:
   NODE_VERSION: 14.15.3-alpine3.12
+  PLATFORMS: linux/amd64,linux/arm/v7,linux/arm64/v8
 
 jobs:
   multi:
@@ -55,7 +56,7 @@ jobs:
         with:
           context: .
           file: ./base/alpine/Dockerfile
-          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+          platforms: ${{ env.PLATFORMS }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.NODE_VERSION }}
           labels: ${{ steps.docker_base_meta.outputs.labels }}
@@ -68,7 +69,7 @@ jobs:
         with:
           context: .
           file: ./strapi/Dockerfile
-          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+          platforms: ${{ env.PLATFORMS }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_strapi_meta.outputs.tags }}
           labels: ${{ steps.docker_strapi_meta.outputs.labels }}
