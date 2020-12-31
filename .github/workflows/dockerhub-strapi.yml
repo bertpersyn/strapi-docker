@@ -24,10 +24,11 @@ jobs:
         id: docker_base_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: bertpersyn/strapi-base
           tag-sha: true
+          tag-custom: bertpersyn/strapi-base:${{ env.NODE_VERSION }}
+          tag-custom-only: true
       -
-        name: Docker strapi base meta
+        name: Docker strapi meta
         id: docker_strapi_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
@@ -58,7 +59,7 @@ jobs:
           file: ./base/alpine/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ env.NODE_VERSION }}
+          tags: ${{ steps.docker_base_meta.outputs.tags }}
           labels: ${{ steps.docker_base_meta.outputs.labels }}
           build-args: |
             NODE_VERSION=${{ env.NODE_VERSION }}
