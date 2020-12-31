@@ -55,7 +55,7 @@ jobs:
         id: docker_base_build
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: ./base/alpine
           file: ./base/alpine/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: ${{ github.event_name != 'pull_request' }}
@@ -68,7 +68,7 @@ jobs:
         id: docker_strapi_build
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: ./strapi
           file: ./strapi/Dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: ${{ github.event_name != 'pull_request' }}
