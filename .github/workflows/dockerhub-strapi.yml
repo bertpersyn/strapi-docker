@@ -24,8 +24,8 @@ jobs:
         id: docker_base_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          tag-sha: true
-          tag-custom: bertpersyn/strapi-base:${{ env.NODE_VERSION }}
+          images: bertpersyn/strapi-base
+          tag-custom: ${{ env.NODE_VERSION }}
           tag-custom-only: true
       -
         name: Docker strapi meta
